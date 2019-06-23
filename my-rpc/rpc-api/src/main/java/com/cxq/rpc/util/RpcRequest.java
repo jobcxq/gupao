@@ -12,6 +12,7 @@ public class RpcRequest implements Serializable {
     private String serviceName; //服务名
     private String methodName;  //方法名
     private Object[] args;      //参数
+    private String version;     //版本
 
     public String getServiceName() {
         return serviceName;
@@ -35,5 +36,13 @@ public class RpcRequest implements Serializable {
 
     public void setArgs(Object[] args) {
         this.args = args;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }
