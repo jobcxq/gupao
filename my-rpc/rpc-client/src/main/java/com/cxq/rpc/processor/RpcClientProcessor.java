@@ -1,5 +1,6 @@
 package com.cxq.rpc.processor;
 
+import com.cxq.rpc.discovery.ZKServerDiscovery;
 import com.cxq.rpc.util.RpcRequest;
 
 import java.io.IOException;
@@ -35,7 +36,10 @@ public class RpcClientProcessor {
         ObjectOutputStream os = null;
         ObjectInputStream is = null;
         try {
-            socket = new Socket(ip,port);   //建立连接
+//            socket = new Socket(ip,port);   //建立连接
+            //建立连接，使用ZK做服务注册中心
+            String[] address = ZKServerDiscovery.discovery(request.getServiceName()).split(":");
+            socket = new Socket(address[0], Integer.parseInt(address[1]));
 
             os = new ObjectOutputStream(socket.getOutputStream());  //网络socket
             os.writeObject(request);    //序列化()

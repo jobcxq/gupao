@@ -33,6 +33,12 @@
             <artifactId>rpc-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!-- 集成 ZK 完成服务注册-->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>4.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>

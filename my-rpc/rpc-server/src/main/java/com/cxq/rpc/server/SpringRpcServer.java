@@ -2,6 +2,7 @@ package com.cxq.rpc.server;
 
 
 import com.cxq.rpc.annotation.RpcService;
+import com.cxq.rpc.registry.ZKRegistryCenter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -9,8 +10,10 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -53,6 +56,7 @@ public class SpringRpcServer implements ApplicationContextAware, InitializingBea
                     serviceName += "-" + version;
                 }
                 rpcServiceMap.put(serviceName,servcieBean);
+                ZKRegistryCenter.register(serviceName,getserviceAddress(port));
             }
         }
 
@@ -81,5 +85,15 @@ public class SpringRpcServer implements ApplicationContextAware, InitializingBea
             }
         }
 
+    }
+
+    public String getserviceAddress(int port){
+        try {
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            return inetAddress.getHostName() + ":" + port;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
