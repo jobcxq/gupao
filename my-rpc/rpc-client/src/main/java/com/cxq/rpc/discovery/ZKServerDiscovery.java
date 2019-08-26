@@ -39,19 +39,23 @@ public class ZKServerDiscovery {
     public static String discovery(String serviceName) {
         try {
             String path = "/" + serviceName;
-            PathChildrenCache pathChildCache = new PathChildrenCache(curatorFramework, path, false);
-            PathChildrenCacheListener listener = (framework, event) -> {
-                serviceAddresList = curatorFramework.getChildren().forPath(path);
-                System.out.println("节点事件变更：[" + event.getType() + "],重新获取节点列表:" + serviceAddresList.toString());
-            };
-            pathChildCache.getListenable().addListener(listener);
-            pathChildCache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);  //首次会从zk获取节点信息
+            if(serviceAddresList == null) {
+                //防止后续调用时，继续注册监听
+                PathChildrenCache pathChildCache = new PathChildrenCache(curatorFramework, path, false);
+                PathChildrenCacheListener listener = (framework, event) -> {
+                    serviceAddresList = curatorFramework.getChildren().forPath(path);
+                    System.out.println("节点事件变更：[" + event.getType() + "],重新获取节点列表:" + serviceAddresList.toString());
+                };
+                pathChildCache.getListenable().addListener(listener);
+                pathChildCache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);  //首次会从zk获取节点信息
+            }
             //负载均衡算法
             LoadBalanceStrategy loadBalance = new RandomLoadBalance();
             String address = ((RandomLoadBalance) loadBalance).selectHost(serviceAddresList);
             System.out.println("负载均衡选择address: " + address);
             if(address == null){
-                System.err.println("！！！！！！节点列表信息未选到，再次选择。。。。。。");
+                System.err.println("！！！！！！节点列表信息未选到，再次尝试获取");
+                discovery(serviceName);
             }
             return address;
         } catch (Exception e) {
